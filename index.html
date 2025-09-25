@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Custom Caffe – Commandes</title>
+  <meta name="description" content="Prise de commande en ligne pour Custom Caffe avec envoi vers Discord." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0f0f10;
+      --panel:#16171a;
+      --muted:#a7a7a7;
+      --text:#f6f6f6;
+      --brand:#c09a5a;
+      --brand-2:#e8c88a;
+      --ok:#27ae60;
+      --warn:#f39c12;
+      --err:#e74c3c;
+      --radius:18px;
+    }
+    * { box-sizing: border-box; }
+    html,body { height:100%; }
+    body {
+      margin:0; font-family:Poppins, system-ui, -apple-system, Segoe UI, Roboto, Inter, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji","Segoe UI Emoji";
+      background: radial-gradient(1400px 900px at 10% 0%, #1b1c1f 0%, var(--bg) 55%) fixed;
+      color:var(--text);
+    }
+    header {
+      max-width:1080px; margin:24px auto 12px; padding:0 16px;
+      display:flex; align-items:center; gap:16px; flex-wrap:wrap;
+    }
+    .logo { width:64px; height:64px; border-radius:50%; object-fit:contain; background:#00000020; }
+    h1 { font-size: clamp(28px, 3vw, 36px); margin:0; letter-spacing:0.5px; display:flex; align-items:center; gap:10px; }
+    h1 small { font-weight:500; color:var(--brand-2); font-size: clamp(13px, 1.6vw, 14px); letter-spacing:1px; border:1px solid #ffffff1a; border-radius:999px; padding:4px 10px; }
+    .container { max-width:1080px; margin:0 auto; padding:8px 16px 48px; }
+    .grid { display:grid; grid-template-columns: 1.2fr 0.8fr; gap:18px; }
+    @media (max-width: 900px) { .grid { grid-template-columns:1fr; } }
+    .card { background:linear-gradient(180deg, #16171a 0%, #121316 100%); border:1px solid #ffffff12; border-radius:var(--radius); box-shadow:0 10px 30px #00000070; }
+    .card > .head { padding:18px 18px 10px; display:flex; align-items:center; justify-content:space-between; gap:12px; border-bottom:1px dashed #ffffff12; }
+    .card > .head h2 { margin:0; font-size:18px; letter-spacing:0.4px; }
+    .card > .body { padding:18px; }
+    .products { display:grid; grid-template-columns: repeat(2,minmax(240px,1fr)); gap:12px; }
+    @media (max-width:700px){ .products{ grid-template-columns:1fr; } }
+    .product { border:1px solid #ffffff12; border-radius:14px; padding:12px; display:grid; grid-template-columns:1fr auto; align-items:center; gap:8px; transition:transform .12s ease;
+      background:linear-gradient(180deg, #1b1c20 0%, #16181d 100%);
+    }
+    .product:hover { transform: translateY(-2px); }
+    .product h3 { margin:0; font-size:15px; font-weight:600; }
+    .muted { color:var(--muted); font-size:12px; }
+    .price { font-weight:600; }
+    .qty { display:flex; align-items:center; gap:8px; }
+    .qty input { width:64px; padding:8px; background:#0e1013; color:var(--text); border:1px solid #ffffff20; border-radius:12px; text-align:center; font-weight:600; }
+    .row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    @media (max-width:700px){ .row{ grid-template-columns:1fr; } }
+    .field { display:flex; flex-direction:column; gap:8px; }
+    .field label { font-size:13px; color:#d7d7d7; }
+    .field input, .field select, .field textarea {
+      background:#0e1013; color:var(--text);
+      border:1px solid #ffffff1d; border-radius:12px; padding:12px; font-size:14px; outline:none;
+    }
+    .field textarea { resize:vertical; min-height:84px; }
+    .totals { display:flex; align-items:center; justify-content:space-between; gap:12px; border-top:1px dashed #ffffff12; padding-top:12px; margin-top:12px; }
+    .btn { appearance:none; border:none; background:linear-gradient(180deg, var(--brand) 0%, #8f6c35 100%); color:#1a1206; font-weight:800; letter-spacing:.3px; padding:14px 16px; border-radius:14px; cursor:pointer; box-shadow:0 6px 18px #00000080; transition:transform .1s ease, filter .1s ease; }
+    .btn:hover { transform: translateY(-1px); filter:brightness(1.02); }
+    .btn:disabled { opacity:.5; cursor:not-allowed; }
+    .chip { display:inline-flex; gap:6px; align-items:center; padding:6px 10px; border-radius:999px; border:1px solid #ffffff20; background:#0e1013; color:#fff; font-size:12px; }
+    .toast { position:fixed; right:16px; bottom:16px; background:#101317; border:1px solid #ffffff20; color:#fff; padding:12px 14px; border-radius:12px; box-shadow:0 10px 30px #00000080; display:none; }
+    .toast.show { display:block; }
+    .toast.ok { border-color:#1ea86290; }
+    .toast.err{ border-color:#e74c3c90; }
+    footer { max-width:1080px; margin:24px auto; padding:0 16px; color:var(--muted); font-size:12px; }
+    .badge { padding:4px 8px; border-radius:8px; border:1px solid #ffffff24; }
+  </style>
+</head>
+<body>
+  <header>
+    <img src="./assets/logo.png" alt="Custom Caffe" class="logo" onerror="this.style.visibility='hidden'"/>
+    <h1>Custom Caffe <small>Prise de commande</small></h1>
+  </header>
+
+  <div class="container">
+    <div class="grid">
+      <section class="card">
+        <div class="head">
+          <h2>Catalogue</h2>
+          <span class="chip"><span style="width:8px;height:8px;border-radius:50%;background:var(--brand);"></span> fluide & optimisé</span>
+        </div>
+        <div class="body">
+          <div id="products" class="products" aria-live="polite"></div>
+
+          <div class="row" style="margin-top:12px;">
+            <div class="field">
+              <label for="customItem">Article personnalisé (optionnel)</label>
+              <input id="customItem" placeholder="Nom de l'article"/>
+            </div>
+            <div class="field">
+              <label for="customPrice">Prix (€)</label>
+              <input id="customPrice" type="number" min="0" step="0.1" placeholder="2.50"/>
+            </div>
+          </div>
+          <div class="row">
+            <div class="field">
+              <label for="customQty">Quantité</label>
+              <input id="customQty" type="number" min="1" step="1" value="1"/>
+            </div>
+            <div class="field">
+              <label>&nbsp;</label>
+              <button class="btn" id="addCustom">Ajouter l'article personnalisé</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <aside class="card">
+        <div class="head">
+          <h2>Commande</h2>
+          <span id="cartCount" class="badge">0 article</span>
+        </div>
+        <div class="body">
+          <div class="field">
+            <label for="urgency">Type d'urgence</label>
+            <select id="urgency">
+              <option>Pas urgent</option>
+              <option>Très urgent</option>
+              <option>Dès que possible</option>
+            </select>
+          </div>
+
+          <div class="row" style="margin-top:6px;">
+            <div class="field">
+              <label for="customerName">Nom du client</label>
+              <input id="customerName" placeholder="Prénom Nom"/>
+            </div>
+            <div class="field">
+              <label for="contact">Contact</label>
+              <input id="contact" placeholder="Téléphone ou email"/>
+            </div>
+          </div>
+
+          <div class="field" style="margin-top:6px;">
+            <label for="note">Note (optionnel)</label>
+            <textarea id="note" placeholder="Précisions, heure de retrait/livraison, sucre, lait, etc."></textarea>
+          </div>
+
+          <div id="cart" style="margin-top:10px; display:grid; gap:10px;"></div>
+
+          <div class="totals">
+            <div class="muted">TVA incluse • EUR</div>
+            <div style="text-align:right">
+              <div class="muted">Sous-total</div>
+              <div id="subtotal" class="price" style="font-size:20px;">0.00 €</div>
+            </div>
+          </div>
+
+          <button id="submit" class="btn" style="margin-top:14px; width:100%" disabled>Envoyer vers Discord</button>
+          <div class="muted" style="margin-top:8px; font-size:11.5px">L'envoi pingera le rôle service pour un traitement rapide.</div>
+        </div>
+      </aside>
+
+    </div>
+  </div>
+
+  <div id="toast" class="toast">Message</div>
+
+  <footer>
+    © <span id="year"></span> Custom Caffe • Propulsé par GitHub Pages
+  </footer>
+
+  <script>
+    const PROXY_URL = ""; // Renseignez l'URL publique de votre Worker/Function ici
+    const COMPANY_NAME = "Custom Caffe";
+    const DISCORD_ROLE_ID = "1393974498172080199";
+
+    const CATALOG = [
+      { id: 'espresso', name: 'Espresso', price: 2.20, desc: 'Court et intense' },
+      { id: 'americano', name: 'Americano', price: 2.70, desc: 'Allongé, doux' },
+      { id: 'cappuccino', name: 'Cappuccino', price: 3.20, desc: 'Mousseux, lait' },
+      { id: 'latte', name: 'Latte', price: 3.50, desc: 'Crémeux, grand' },
+      { id: 'mocha', name: 'Mocha', price: 3.80, desc: 'Chocolat + espresso' },
+      { id: 'coldbrew', name: 'Cold Brew', price: 3.40, desc: 'Infusion à froid' }
+    ];
+
+    const cart = new Map();
+    const el = (sel) => document.querySelector(sel);
+    function fmt(n){ return n.toFixed(2).replace('.', ',') + ' €'; }
+    function toast(msg, kind='ok'){
+      const t = el('#toast');
+      t.textContent = msg; t.className = 'toast show ' + (kind === 'ok' ? 'ok':'err');
+      setTimeout(()=>{ t.className = 'toast'; }, 2800);
+    }
+
+    function renderCatalog(){
+      const wrap = el('#products');
+      wrap.innerHTML = '';
+      for (const p of CATALOG){
+        const div = document.createElement('div');
+        div.className = 'product';
+        div.innerHTML = `
+          <div>
+            <h3>${p.name}</h3>
+            <div class="muted">${p.desc ?? ''}</div>
+          </div>
+          <div class="qty">
+            <span class="price">${fmt(p.price)}</span>
+            <input type="number" min="0" step="1" value="0" data-id="${p.id}" aria-label="Quantité ${p.name}">
+          </div>
+        `;
+        wrap.appendChild(div);
+      }
+      wrap.querySelectorAll('input[type="number"]').forEach(inp=>{
+        inp.addEventListener('input', (e)=>{
+          const id = e.target.dataset.id;
+          const prod = CATALOG.find(x=>x.id===id);
+          const qty = Math.max(0, parseInt(e.target.value||'0',10));
+          if(qty>0){ cart.set(id,{ name: prod.name, price: prod.price, qty }); }
+          else { cart.delete(id); }
+          renderCart();
+        });
+      });
+    }
+
+    function renderCart(){
+      const area = el('#cart'); area.innerHTML='';
+      let subtotal = 0, count = 0;
+      for (const [id, item] of cart){
+        const line = document.createElement('div');
+        line.style.display='grid';
+        line.style.gridTemplateColumns='1fr auto auto';
+        line.style.gap='10px';
+        const lineTotal = item.qty * item.price; subtotal += lineTotal; count += item.qty;
+        line.innerHTML = `
+          <div><strong>${item.name}</strong><div class="muted">x${item.qty}</div></div>
+          <div class="price" style="align-self:center;">${fmt(lineTotal)}</div>
+          <button class="btn" style="padding:8px 10px; align-self:center;" data-del="${id}">×</button>
+        `;
+        area.appendChild(line);
+      }
+      el('#subtotal').textContent = subtotal.toFixed(2).replace('.', ',') + ' €';
+      el('#cartCount').textContent = count + (count>1 ? ' articles':' article');
+      el('#submit').disabled = cart.size === 0;
+      area.querySelectorAll('button[data-del]').forEach(btn=>{
+        btn.addEventListener('click', ()=>{ cart.delete(btn.dataset.del); renderCart();
+          const input = document.querySelector(`input[data-id="${btn.dataset.del}"]`);
+          if (input) input.value = 0;
+        });
+      });
+    }
+
+    el('#addCustom').addEventListener('click', ()=>{
+      const name = el('#customItem').value.trim();
+      const price = parseFloat(el('#customPrice').value.replace(',', '.'));
+      const qty = parseInt(el('#customQty').value, 10) || 1;
+      if(!name || isNaN(price) || price < 0){ return toast('Complétez l\'article personnalisé correctement.', 'err'); }
+      const id = 'custom-' + Math.random().toString(36).slice(2,8);
+      cart.set(id, { name, price, qty });
+      el('#customItem').value=''; el('#customPrice').value=''; el('#customQty').value='1';
+      renderCart();
+      toast('Article ajouté.');
+    });
+
+    async function sendToDiscord(payload){
+      if(!PROXY_URL){ throw new Error('PROXY_URL manquant.'); }
+      const res = await fetch(PROXY_URL, {
+        method:'POST',
+        headers:{ 'Content-Type':'application/json' },
+        body: JSON.stringify(payload)
+      });
+      if(!res.ok){ throw new Error('Échec HTTP ' + res.status); }
+      return await res.json().catch(()=>({ ok:true }));
+    }
+
+    function buildDiscordPayload(){
+      const urgency = el('#urgency').value;
+      const customer = el('#customerName').value.trim() || 'Anonyme';
+      const contact = el('#contact').value.trim() || '—';
+      const note = el('#note').value.trim();
+
+      let total = 0; const lines=[];
+      cart.forEach(item=>{ total += item.qty * item.price; lines.push(`• **${item.name}** × ${item.qty} — ${fmt(item.price)} /un.`); });
+
+      const content = `<@&${DISCORD_ROLE_ID}> Nouvelle commande pour **${COMPANY_NAME}**`;
+      const embed = {
+        title: `🧾 Commande – ${customer}`,
+        description: lines.join('\n'),
+        color: 0xC09A5A,
+        fields: [
+          { name:'Urgence', value: urgency, inline:true },
+          { name:'Total', value: fmt(total), inline:true },
+          { name:'Contact', value: contact, inline:false },
+          ...(note ? [{ name:'Note', value: note, inline:false }] : [])
+        ],
+        footer: { text: COMPANY_NAME },
+        timestamp: new Date().toISOString()
+      };
+      return { content, embeds: [embed] };
+    }
+
+    el('#submit').addEventListener('click', async ()=>{
+      try {
+        el('#submit').disabled = true;
+        const payload = buildDiscordPayload();
+        await sendToDiscord(payload);
+        toast('Commande envoyée à Discord ✅');
+        cart.clear(); renderCart();
+        document.querySelectorAll('#products input[type="number"]').forEach(i=>i.value=0);
+        el('#note').value='';
+      } catch(err){
+        console.error(err);
+        toast('Impossible d\'envoyer sur Discord (proxy ?).', 'err');
+      } finally {
+        el('#submit').disabled = cart.size === 0;
+      }
+    });
+
+    renderCatalog(); renderCart(); el('#year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
