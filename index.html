@@ -86,7 +86,7 @@
       <section class="card">
         <div class="head">
           <h2>Catalogue</h2>
-          <span class="chip"><span style="width:8px;height:8px;border-radius:50%;background:var(--brand);"></span> fluide & optimisé</span>
+          <span class="chip"><span style="width:8px;height:8px;border-radius:50%;background:var(--brand);"></span> Rapidité & Efficatité </span>
         </div>
         <div class="body">
           <div id="products" class="products" aria-live="polite"></div>
@@ -97,7 +97,7 @@
               <input id="customItem" placeholder="Nom de l'article"/>
             </div>
             <div class="field">
-              <label for="customPrice">Prix (€)</label>
+              <label for="customPrice">Prix ($)</label>
               <input id="customPrice" type="number" min="0" step="0.1" placeholder="2.50"/>
             </div>
           </div>
@@ -148,10 +148,10 @@
           <div id="cart" style="margin-top:10px; display:grid; gap:10px;"></div>
 
           <div class="totals">
-            <div class="muted">TVA incluse • EUR</div>
+            <div class="muted">TVA incluse • USD</div>
             <div style="text-align:right">
               <div class="muted">Sous-total</div>
-              <div id="subtotal" class="price" style="font-size:20px;">0.00 €</div>
+              <div id="subtotal" class="price" style="font-size:20px;">0.00 $</div>
             </div>
           </div>
 
@@ -175,12 +175,11 @@
     const DISCORD_ROLE_ID = "1393974498172080199";
 
     const CATALOG = [
-      { id: 'espresso', name: 'Espresso', price: 2.20, desc: 'Court et intense' },
-      { id: 'americano', name: 'Americano', price: 2.70, desc: 'Allongé, doux' },
-      { id: 'cappuccino', name: 'Cappuccino', price: 3.20, desc: 'Mousseux, lait' },
-      { id: 'latte', name: 'Latte', price: 3.50, desc: 'Crémeux, grand' },
-      { id: 'mocha', name: 'Mocha', price: 3.80, desc: 'Chocolat + espresso' },
-      { id: 'coldbrew', name: 'Cold Brew', price: 3.40, desc: 'Infusion à froid' }
+      { id: 'elgrandejefe', name: 'El Grande Jefe', price: 220, desc: 'Lechón + jus d ananas + churros chocolat' },
+      { id: 'DLVG', name: 'DLVG', price: 120, desc: 'Picadillo Soda Pastèque Tiramisu' },
+      { id: 'Tropical', name: 'Tropical', price: 75, desc: 'Fajitas, Jus' },
+      { id: 'Cubamarina', name: 'Cuba Marina', price: 75, desc: 'Ceviche, Horchata' },
+      { id: 'Havanachill', name: 'Havana Chill', price: 90, desc: 'Pez Cubano + Maté' },
     ];
 
     const cart = new Map();
